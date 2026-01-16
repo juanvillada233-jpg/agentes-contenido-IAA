@@ -22,7 +22,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install google-generativeai==0.5.4
+          pip install requests
 
       - name: Ejecutar agentes
         env:
