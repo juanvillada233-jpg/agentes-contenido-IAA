@@ -1,10 +1,16 @@
-import google.generativeai as genai
+import requests
 import os
+import json
 
 def generar_copy():
-    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    api_key = os.getenv("GEMINI_API_KEY")
 
-    model = genai.GenerativeModel("gemini-1.0-pro")
+    url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key
+    }
 
     prompt = """
     Escribe un copy corto, emocional y profesional,
@@ -13,5 +19,13 @@ def generar_copy():
     En español.
     """
 
-    response = model.generate_content(prompt)
-    return response.text
+    data = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+
+    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
