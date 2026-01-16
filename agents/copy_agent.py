@@ -1,4 +1,4 @@
-import requests
+import google.generativeai as genai
 import os
 from datetime import datetime
 import random
@@ -6,9 +6,11 @@ import random
 def generar_copy():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("GEMINI_API_KEY no está configurada")
+        raise ValueError("GEMINI_API_KEY no configurada")
 
-    url = f"https://generativeai.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    genai.configure(api_key=api_key)
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     estilos = [
         "motivacional",
@@ -19,30 +21,16 @@ def generar_copy():
     ]
 
     prompt = f"""
-    Escribe un copy corto para redes sociales (Instagram o TikTok).
-    Estilo: {random.choice(estilos)}.
+    Escribe un copy corto para Instagram o TikTok.
+    Estilo: {random.choice(estilos)}
     Máximo 2 líneas.
     En español.
-    No uses hashtags.
+    Sin hashtags.
     Fecha: {datetime.now().strftime('%Y-%m-%d')}
     """
 
-    data = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": prompt}
-                ]
-            }
-        ]
-    }
+    response = model.generate_content(prompt)
 
-    response = requests.post(url, json=data, timeout=30)
+    return response.text.strip()
 
-    if response.status_code != 200:
-        raise RuntimeError(f"Error Gemini: {response.text}")
-
-    result = response.json()
-
-    return result["candidates"][0]["content"]["parts"][0]["text"].strip()
 
