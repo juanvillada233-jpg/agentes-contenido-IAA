@@ -2,9 +2,9 @@ name: Generar contenido diario
 
 on:
   schedule:
-    - cron: '0 14 * * *'  # 9:00 AM Colombia
-    - cron: '0 19 * * *'  # 2:00 PM Colombia
-    - cron: '0 0 * * *'   # 7:00 PM Colombia
+    - cron: '0 14 * * *'   # 9:00 AM Colombia
+    - cron: '0 19 * * *'   # 2:00 PM Colombia
+    - cron: '0 0 * * *'    # 7:00 PM Colombia
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install google-generativeai
+          pip install --upgrade google-generativeai
 
       - name: Ejecutar agentes
         env:
