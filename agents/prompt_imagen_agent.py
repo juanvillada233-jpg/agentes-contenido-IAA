@@ -1,37 +1,25 @@
-
 import google.generativeai as genai
 import os
-from datetime import datetime
 
-def generar_prompt_imagen(copy_texto):
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY no configurada")
+def generar_prompt_imagen():
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = """
+    Crea un prompt detallado para generar una imagen
+    realista, profesional y emocional,
+    ideal para redes sociales.
 
-    prompt = f"""
-    A partir del siguiente copy:
-
-    "{copy_texto}"
-
-    Genera un prompt de imagen con estas características:
+    Requisitos:
+    - Formato vertical 9:16
     - Estilo cinematográfico
-    - Emocional
-    - Realista
-    - Vertical 9:16
     - Iluminación natural
     - Alta calidad
-    - Sin texto en la imagen
     - En español
-
-    Devuelve SOLO el prompt de imagen.
-    Fecha: {datetime.now().strftime('%Y-%m-%d')}
     """
 
     response = model.generate_content(prompt)
+    return response.text
 
-    return response.text.strip()
 
