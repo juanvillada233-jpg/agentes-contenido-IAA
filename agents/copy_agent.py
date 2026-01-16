@@ -4,7 +4,7 @@ import os
 def generar_copy():
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-    model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
+    model = genai.GenerativeModel("gemini-1.5-pro")
 
     prompt = """
     Escribe un copy corto, emocional y profesional,
