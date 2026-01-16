@@ -8,8 +8,7 @@ def generar_prompt_imagen(copy_texto):
     if not api_key:
         raise ValueError("GEMINI_API_KEY no está configurada")
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
     prompt = f"""
     A partir del siguiente copy para redes sociales:
 
