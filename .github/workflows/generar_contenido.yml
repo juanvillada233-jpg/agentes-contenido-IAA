@@ -22,15 +22,17 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install requests
+          pip install requests google-api-python-client google-auth google-auth-oauthlib
 
       - name: Ejecutar agentes
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
         run: |
           python main.py
 
-      - name: Subir resultados
+      - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: contenido-generado
