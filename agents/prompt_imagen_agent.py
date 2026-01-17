@@ -1,41 +1,40 @@
-import os
 import requests
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+import os
 
 def generar_prompt_imagen():
-    if not GROQ_API_KEY:
-        raise ValueError("❌ GROQ_API_KEY no está definida")
+    api_key = os.getenv("GROQ_API_KEY")
 
     url = "https://api.groq.com/openai/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
 
-    payload = {
-        "model": "llama3-70b-8192",
+    data = {
+        "model": "llama3-8b-8192",
         "messages": [
             {
                 "role": "system",
-                "content": "Eres un director creativo experto en campañas visuales."
+                "content": "Eres un experto en creación de prompts para IA generadora de imágenes."
             },
             {
                 "role": "user",
                 "content": (
-                    "Genera un prompt detallado para crear una imagen publicitaria "
-                    "profesional para redes sociales. Debe ser realista, atractiva "
-                    "y enfocada en marketing digital."
+                    "Crea un prompt detallado para generar una imagen realista, "
+                    "profesional y emocional para redes sociales. "
+                    "Formato vertical 9:16, estilo cinematográfico, iluminación natural, "
+                    "alta calidad. En español."
                 )
             }
         ],
-        "temperature": 0.8,
-        "max_tokens": 400
+        "temperature": 0.8
     }
 
-    response = requests.post(url, headers=headers, json=payload)
-    response.raise_for_status()
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        raise RuntimeError(response.text)
 
     return response.json()["choices"][0]["message"]["content"]
 
