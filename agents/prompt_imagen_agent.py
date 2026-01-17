@@ -12,21 +12,10 @@ def generar_prompt_imagen():
     }
 
     data = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.1-8b-instant",
         "messages": [
-            {
-                "role": "system",
-                "content": "Eres un experto en creación de prompts para IA generadora de imágenes."
-            },
-            {
-                "role": "user",
-                "content": (
-                    "Crea un prompt detallado para generar una imagen realista, "
-                    "profesional y emocional para redes sociales. "
-                    "Formato vertical 9:16, estilo cinematográfico, iluminación natural, "
-                    "alta calidad. En español."
-                )
-            }
+            {"role": "system", "content": "Eres un experto en creación de prompts para imágenes IA."},
+            {"role": "user", "content": "Crea un prompt detallado para una imagen realista y emocional para redes sociales. Formato 9:16, estilo cinematográfico, iluminación natural, alta calidad. En español."}
         ],
         "temperature": 0.8
     }
@@ -37,4 +26,3 @@ def generar_prompt_imagen():
         raise RuntimeError(response.text)
 
     return response.json()["choices"][0]["message"]["content"]
-
