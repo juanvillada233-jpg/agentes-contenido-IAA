@@ -1,37 +1,41 @@
-import requests
 import os
-import json
+import requests
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 def generar_prompt_imagen():
-    api_key = os.getenv("GEMINI_API_KEY")
+    if not GROQ_API_KEY:
+        raise ValueError("❌ GROQ_API_KEY no está definida")
 
-    url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+    url = "https://api.groq.com/openai/v1/chat/completions"
 
     headers = {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": api_key
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
     }
 
-    prompt = """
-    Crea un prompt detallado para generar una imagen
-    realista, profesional y emocional,
-    ideal para redes sociales.
-
-    Requisitos:
-    - Formato vertical 9:16
-    - Estilo cinematográfico
-    - Iluminación natural
-    - Alta calidad
-    - En español
-    """
-
-    data = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
+    payload = {
+        "model": "llama3-70b-8192",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Eres un director creativo experto en campañas visuales."
+            },
+            {
+                "role": "user",
+                "content": (
+                    "Genera un prompt detallado para crear una imagen publicitaria "
+                    "profesional para redes sociales. Debe ser realista, atractiva "
+                    "y enfocada en marketing digital."
+                )
+            }
+        ],
+        "temperature": 0.8,
+        "max_tokens": 400
     }
 
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
 
-    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+    return response.json()["choices"][0]["message"]["content"]
+
