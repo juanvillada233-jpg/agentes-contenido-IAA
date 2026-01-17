@@ -10,7 +10,7 @@ def run_agents():
 
     # Ejecutar agentes
     copy = generar_copy()
-    prompt_imagen = generar_prompt_imagen(copy)
+    prompt_imagen = generar_prompt_imagen()
 
     # Armar resultado
     contenido = {
