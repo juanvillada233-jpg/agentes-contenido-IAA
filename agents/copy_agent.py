@@ -1,36 +1,37 @@
-import os
 import requests
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+import os
 
 def generar_copy():
-    if not GROQ_API_KEY:
-        raise ValueError("❌ GROQ_API_KEY no está definida")
+    api_key = os.getenv("GROQ_API_KEY")
 
     url = "https://api.groq.com/openai/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
 
-    payload = {
-        "model": "llama3-70b-8192",
+    data = {
+        "model": "llama3-8b-8192",
         "messages": [
             {
                 "role": "system",
-                "content": "Eres un experto en marketing digital y copywriting."
+                "content": "Eres un experto en marketing digital y redes sociales."
             },
             {
                 "role": "user",
-                "content": "Crea un copy publicitario profesional, persuasivo y corto para redes sociales."
+                "content": (
+                    "Escribe un copy corto, emocional y profesional "
+                    "para Instagram o TikTok. Máximo 2 líneas. En español."
+                )
             }
         ],
-        "temperature": 0.7,
-        "max_tokens": 300
+        "temperature": 0.8
     }
 
-    response = requests.post(url, headers=headers, json=payload)
-    response.raise_for_status()
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        raise RuntimeError(response.text)
 
     return response.json()["choices"][0]["message"]["content"]
