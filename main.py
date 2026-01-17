@@ -1,7 +1,8 @@
-from agent_copy import generar_copy
-from agent_image import generar_prompt_imagen
-from drive_uploader import subir_json_drive
+from agents.copy_agent import generar_copy
+from agents.prompt_imagen_agent import generar_prompt_imagen
+from drive.drive_uploader import subir_json_drive
 from datetime import datetime
+
 
 def run_agents():
     contenidos = []
@@ -28,6 +29,7 @@ def run_agents():
     }
 
     subir_json_drive(data)
+
 
 if __name__ == "__main__":
     run_agents()
