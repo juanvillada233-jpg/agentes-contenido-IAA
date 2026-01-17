@@ -12,19 +12,10 @@ def generar_copy():
     }
 
     data = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.1-8b-instant",
         "messages": [
-            {
-                "role": "system",
-                "content": "Eres un experto en marketing digital y redes sociales."
-            },
-            {
-                "role": "user",
-                "content": (
-                    "Escribe un copy corto, emocional y profesional "
-                    "para Instagram o TikTok. Máximo 2 líneas. En español."
-                )
-            }
+            {"role": "system", "content": "Eres un experto en marketing digital."},
+            {"role": "user", "content": "Escribe un copy corto, emocional y profesional para Instagram o TikTok. Máximo 2 líneas. En español."}
         ],
         "temperature": 0.8
     }
