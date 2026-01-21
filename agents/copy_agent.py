@@ -1,12 +1,8 @@
 import requests
 import os
 
-
 def generar_copy(tipo):
     api_key = os.getenv("GROQ_API_KEY")
-
-    if not api_key:
-        raise RuntimeError("No se encontró la variable de entorno GROQ_API_KEY")
 
     url = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -16,35 +12,16 @@ def generar_copy(tipo):
     }
 
     prompts = {
-        "inspiracional": (
-            "Escribe un copy motivacional corto, poderoso e inspirador "
-            "para empezar el día. Sin CTA. En español."
-        ),
-        "disciplina": (
-            "Escribe un copy motivacional enfocado en disciplina, constancia "
-            "y esfuerzo diario. Sin CTA. En español."
-        ),
-        "cta": (
-            "Escribe un copy motivacional con cierre fuerte e inspirador. "
-            "Incluye un CTA suave para seguir la cuenta, guardar o compartir. "
-            "En español."
-        )
+        "inspiracional": "Escribe un copy motivacional corto, positivo e inspirador para empezar el día. Sin CTA. En español.",
+        "disciplina": "Escribe un copy motivacional enfocado en disciplina, constancia y esfuerzo diario. Sin CTA. En español.",
+        "cta": "Escribe un copy motivacional con cierre poderoso e incluye un CTA suave para seguir la cuenta o compartir. En español."
     }
-
-    if tipo not in prompts:
-        raise ValueError(f"Tipo de copy no soportado: {tipo}")
 
     data = {
         "model": "llama-3.1-8b-instant",
         "messages": [
-            {
-                "role": "system",
-                "content": "Eres un experto en marketing motivacional para redes sociales."
-            },
-            {
-                "role": "user",
-                "content": prompts[tipo]
-            }
+            {"role": "system", "content": "Eres un experto en marketing motivacional para redes sociales."},
+            {"role": "user", "content": prompts[tipo]}
         ],
         "temperature": 0.8
     }
