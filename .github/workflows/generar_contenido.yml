@@ -2,9 +2,9 @@ name: Generar contenido diario
 
 on:
   schedule:
-    - cron: '0 14 * * *'   # 9:00 AM Colombia
-    - cron: '0 19 * * *'   # 2:00 PM Colombia
-    - cron: '0 0 * * *'    # 7:00 PM Colombia
+    - cron: '0 9 * * *'   # 09:00 UTC
+    - cron: '0 14 * * *'  # 14:00 UTC
+    - cron: '0 19 * * *'  # 19:00 UTC
   workflow_dispatch:
 
 jobs:
