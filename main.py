@@ -1,40 +1,37 @@
-from agents.copy_agent import generar_copy
-from agents.prompt_imagen_agent import generar_prompt_imagen
-from datetime import datetime
-import json
 import os
+import datetime
+from agents.copy_agent import generar_copy_experto
 
-def run_agents():
-    contenidos = []
+def tarea_diaria():
+    # Temas basados en el entrenamiento de 500k seguidores
+    # Puedes cambiar "resiliencia" por "fe" o "autoestima"
+    tema_de_hoy = "resiliencia" 
+    
+    print(f"--- Iniciando generación de: {tema_de_hoy} ---")
+    
+    try:
+        # 1. El agente genera la frase con técnica de ingeniería inversa
+        frase_final = generar_copy_experto(tema_de_hoy)
+        
+        # 2. Creamos la carpeta output si no existe
+        if not os.path.exists('output'):
+            os.makedirs('output')
+        
+        # 3. Guardamos la frase en un archivo con la fecha
+        fecha = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+        ruta_archivo = f"output/frase_{fecha}.txt"
+        
+        with open(ruta_archivo, "w", encoding="utf-8") as f:
+            f.write(frase_final)
+            
+        print(f"✅ ÉXITO: Frase guardada en {ruta_archivo}")
+        print(f"Contenido: {frase_final}")
 
-    tipos = [
-        "inspiracional",
-        "disciplina",
-        "cta"
-    ]
-
-    for tipo in tipos:
-        copy = generar_copy(tipo)
-        prompt_imagen = generar_prompt_imagen(copy)
-
-        contenidos.append({
-            "tipo": tipo,
-            "copy": copy,
-            "prompt_imagen": prompt_imagen
-        })
-
-    data = {
-        "fecha": datetime.now().isoformat(),
-        "contenidos": contenidos
-    }
-
-    os.makedirs("output", exist_ok=True)
-
-    nombre_archivo = f"contenido_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    ruta_archivo = f"output/{nombre_archivo}"
-
-    with open(ruta_archivo, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        # --- AQUÍ SIGUE TU LÓGICA DE GOOGLE DRIVE ---
+        # Asegúrate de pasar 'frase_final' a tu función de subida a Drive
+        
+    except Exception as e:
+        print(f"❌ ERROR en el flujo: {e}")
 
 if __name__ == "__main__":
-    run_agents()
+    tarea_diaria()
