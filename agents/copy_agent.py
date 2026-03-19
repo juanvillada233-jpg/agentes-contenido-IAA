@@ -46,7 +46,7 @@ def generar_copy_experto(tipo):
     prompt_usuario = f"Tema de hoy: {temas.get(tipo, temas['resiliencia'])}. Escribe una frase viral siguiendo el estilo entrenado."
 
     data = {
-        "model": "llama-3.1-70b-versatile", # Modelo potente para captar el matiz emocional
+        "model": "llama-3.1-8b-instant", # Modelo potente para captar el matiz emocional
         "messages": [
             {"role": "system", "content": system_prompt + ejemplos_guia},
             {"role": "user", "content": prompt_usuario}
