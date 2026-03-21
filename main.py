@@ -8,11 +8,10 @@ def log(msg):
     print(f"DEBUG: {msg}", flush=True)
 
 def crear_imagen_pro(texto, nombre_empresa="@TuCliente"):
-    W, H = (1080, 1350) # Formato Portrait Instagram
+    W, H = (1080, 1350)
     img = Image.new('RGB', (W, H), color='black')
     draw = ImageDraw.Draw(img)
     
-    # Intentar cargar la fuente elegante
     try:
         font_principal = ImageFont.truetype("Montserrat-Bold.ttf", 90)
         font_marca = ImageFont.truetype("Montserrat-Bold.ttf", 40)
@@ -20,21 +19,29 @@ def crear_imagen_pro(texto, nombre_empresa="@TuCliente"):
         font_principal = ImageFont.load_default()
         font_marca = ImageFont.load_default()
 
-    # Ajustar el texto para que no se salga de la imagen
     lineas = textwrap.wrap(texto, width=22) 
     
-    # Dibujar la frase centrada
-    y_text = (H / 2) - (50 * len(lineas))
+    # --- CAMBIO AQUÍ PARA EVITAR EL ERROR 'textsize' ---
+    # Calculamos el alto total del bloque de texto
+    line_heights = [draw.textbbox((0, 0), line, font=font_principal)[3] for line in lineas]
+    total_text_height = sum(line_heights) + (20 * (len(lineas) - 1))
+    
+    y_text = (H - total_text_height) / 2
+    
     for line in lineas:
-        w, h = draw.textsize(line, font=font_principal)
+        # Usamos textbbox para centrar horizontalmente
+        bbox = draw.textbbox((0, 0), line, font=font_principal)
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
         draw.text(((W - w) / 2, y_text), line, font=font_principal, fill="white")
-        y_text += h + 20
+        y_text += h + 25 # Espaciado entre líneas
 
-    # Dibujar la marca de agua abajo (El toque profesional)
-    w_m, h_m = draw.textsize(nombre_empresa, font=font_marca)
+    # Marca de agua corregida también
+    bbox_m = draw.textbbox((0, 0), nombre_empresa, font=font_marca)
+    w_m = bbox_m[2] - bbox_m[0]
     draw.text(((W - w_m) / 2, H - 150), nombre_empresa, font=font_marca, fill="gray")
+    # ---------------------------------------------------
 
-    # Guardar localmente
     if not os.path.exists('galeria_maqueta'): os.makedirs('galeria_maqueta')
     ruta = f"galeria_maqueta/post_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.jpg"
     img.save(ruta, quality=95)
