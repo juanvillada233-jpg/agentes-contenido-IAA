@@ -1,4 +1,17 @@
-- name: Clonar repositorio
+name: Generar contenido diario
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+    - cron: '0 14 * * *'
+    - cron: '0 19 * * *'
+  workflow_dispatch:
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
         uses: actions/checkout@v4
 
       - name: Configurar Python
@@ -16,4 +29,4 @@
           GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
           DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
           HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
-        run: python main.py  # <--- Quitamos rutas raras, directo al grano
+        run: python -u main.py
