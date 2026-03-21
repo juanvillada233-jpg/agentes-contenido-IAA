@@ -1,63 +1,32 @@
-import os
-import datetime
-import json
-import requests
-import io
-from PIL import Image, ImageDraw, ImageFont
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-from agents.copy_agent import generar_copy_experto
+name: Generar contenido diario
 
-def log(msg):
-    print(f"DEBUG: {msg}", flush=True)
+on:
+  schedule:
+    - cron: '0 9 * * *'
+    - cron: '0 14 * * *'
+    - cron: '0 19 * * *'
+  workflow_dispatch:
 
-def subir_a_drive(nombre_archivo, ruta_fisica):
-    try:
-        info = json.loads(os.getenv("GOOGLE_SERVICE_ACCOUNT"))
-        creds = service_account.Credentials.from_service_account_info(info)
-        drive_service = build('drive', 'v3', credentials=creds)
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
 
-        file_metadata = {
-            'name': nombre_archivo,
-            'parents': [os.getenv("DRIVE_FOLDER_ID")]
-        }
-        media = MediaFileUpload(ruta_fisica, mimetype='image/jpeg')
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-        file = drive_service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id',
-            supportsAllDrives=True
-        ).execute()
-        log(f"🚀 EXITAZO TOTAL: Archivo en Drive ID: {file.get('id')}")
-    except Exception as e:
-        log(f"❌ ERROR DRIVE: {e}")
+      - name: Instalar dependencias
+        run: |
+          pip install requests google-api-python-client google-auth google-auth-oauthlib Pillow
 
-def tarea_diaria():
-    log("--- 🤖 AGENTE CONTENIDO IA INICIANDO ---")
-    try:
-        # 1. Frase
-        frase = generar_copy_experto("resiliencia")
-        log(f"📝 Frase: {frase}")
-
-        # 2. Imagen (Fondo Negro Simple para asegurar éxito)
-        if not os.path.exists('output'): os.makedirs('output')
-        img = Image.new('RGB', (1080, 1350), color='black') # Formato Portrait Instagram
-        draw = ImageDraw.Draw(img)
-        
-        # Escribir la frase
-        draw.text((540, 675), frase, fill="white", anchor="mm", align="center")
-        
-        ruta_post = "output/post_final.jpg"
-        img.save(ruta_post, quality=95)
-        
-        # 3. Subir
-        fecha = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
-        subir_a_drive(f"post_{fecha}.jpg", ruta_post)
-
-    except Exception as e:
-        log(f"❌ ERROR GENERAL: {e}")
-
-if __name__ == "__main__":
-    tarea_diaria()
+      - name: Ejecutar agentes
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+        run: python -u main.py
