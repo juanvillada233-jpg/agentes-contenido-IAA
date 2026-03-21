@@ -1,17 +1,15 @@
-name: Generar contenido diario
+name: Generar Contenido Maqueta
 
 on:
+  workflow_dispatch: # Botón manual para tus pruebas
   schedule:
-    - cron: '0 9 * * *'
-    - cron: '0 14 * * *'
-    - cron: '0 19 * * *'
-  workflow_dispatch:
+    - cron: '0 9 * * *' # 9 AM automático
 
 jobs:
-  generar:
+  construir:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar repositorio
+      - name: Clonar código
         uses: actions/checkout@v4
 
       - name: Configurar Python
@@ -19,11 +17,18 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Instalar dependencias
-        run: |
-          pip install requests
+      - name: Instalar herramientas de diseño
+        run: pip install requests Pillow
 
-      - name: Ejecutar agentes
+      - name: Ejecutar Agente Diseñador
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python -u main.py
+
+      - name: Guardar en Galería de GitHub
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add galeria_maqueta/*.jpg
+          git commit -m "🤖 Nuevo Post Diseñado"
+          git push
