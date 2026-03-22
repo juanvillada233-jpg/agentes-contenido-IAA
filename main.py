@@ -8,112 +8,95 @@ def log(msg):
     print(f"DEBUG: {msg}", flush=True)
 
 # ==========================================
-# CONFIGURACIÓN DE TU MARCA (Monetización)
+# CONFIGURACIÓN DE TU MARCA
 NOMBRE_PAGINA = "Mente Autónoma"
 USUARIO_IG = "@menteautonoma_ai"
 # ==========================================
 
-def crear_post_916_premium(frase):
-    # Formato vertical 9:16 (Reels/Stories) - 1080x1920
-    W, H = (1080, 1920)
+def crear_post_cuadrado_fino(frase):
+    # Formato cuadrado 1:1 para Facebook e Instagram Feed
+    W, H = (1080, 1080)
     img = Image.new('RGB', (W, H), color='white')
     draw = ImageDraw.Draw(img)
     
-    # 1. CARGAR FUENTES (Mismo nombre, diferente grosor)
+    # 1. CARGAR FUENTES (Asegúrate de tener Montserrat-Regular.ttf en el repo)
     try:
-        # Bold para títulos y Regular para el cuerpo (toque fino)
         font_header_bold = ImageFont.truetype("Montserrat-Bold.ttf", 45)
         font_header_regular = ImageFont.truetype("Montserrat-Regular.ttf", 38)
-        font_cuerpo_regular = ImageFont.truetype("Montserrat-Regular.ttf", 55) # <--- FUENTE FINA
+        # Usamos Regular aquí para que se vea fino como el ejemplo que te gustó
+        font_cuerpo_regular = ImageFont.truetype("Montserrat-Regular.ttf", 55) 
     except Exception as e:
-        log(f"⚠️ Error cargando fuentes (.ttf). Asegúrate de subir Montserrat-Regular.ttf y Montserrat-Bold.ttf. Error: {e}")
+        log(f"⚠️ Error fuentes: {e}")
         font_header_bold = font_header_regular = font_cuerpo_regular = ImageFont.load_default()
 
-    # MÁRGENES DE SEGURIDAD PROFESIONALES (12% de cada borde)
+    # MÁRGENES DE SEGURIDAD (12% de cada borde)
     m_left = int(W * 0.12)
     m_right = int(W * 0.88)
-    m_top = int(H * 0.10) # Un poco más de aire arriba
-    m_bottom = int(H * 0.90)
+    m_top = int(H * 0.12)
+    m_bottom = int(H * 0.88)
 
-    # 2. CABECERA (Logo y Nombre de Marca)
+    # 2. CABECERA (Logo y Nombres apilados)
     try:
-        # Cargamos tu archivo 'logo.png'
         logo = Image.open("logo.png").convert("RGBA")
-        # Redimensionamos el logo (ejemplo: 140x140px)
-        logo = logo.resize((140, 140))
-        # Lo pegamos
+        logo = logo.resize((125, 125))
         img.paste(logo, (m_left, m_top), logo)
         
-        # Texto del nombre (Bold) y usuario (Regular) - ¡CORREGIDO ABAJO!
-        draw.text((m_left + 170, m_top + 15), NOMBRE_PAGINA, font=font_header_bold, fill="black")
-        draw.text((m_left + 170, m_top + 75), USUARIO_IG, font=font_header_regular, fill="gray")
-        
-    except Exception as e:
-        log(f"⚠️ No se encontró 'logo.png' o hubo un error. Usando respaldo básico. Error: {e}")
-        draw.text((m_left, m_top), NOMBRE_PAGINA, font=font_header_bold, fill="black")
-        draw.text((m_left, m_top + 60), USUARIO_IG, font=font_header_regular, fill="gray")
+        # Nombre en negrita y usuario justo debajo en gris
+        draw.text((m_left + 155, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill="black")
+        draw.text((m_left + 155, m_top + 70), USUARIO_IG, font=font_header_regular, fill="gray")
+    except:
+        # Círculo fucsia si no hay logo.png
+        draw.ellipse([m_left, m_top, m_left+125, m_top+125], fill=(255, 0, 127))
+        draw.text((m_left + 155, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill="black")
+        draw.text((m_left + 155, m_top + 70), USUARIO_IG, font=font_header_regular, fill="gray")
 
-    # 3. CUERPO DE TEXTO (Frase con fuente fina)
-    # textwrap ajusta para que no se corte el texto
-    # width=35 es un buen ancho para Montserrat-Regular a 55px
-    lineas = textwrap.wrap(frase, width=35)
+    # 3. CUERPO DE TEXTO (Frase fina a la izquierda)
+    # Ajustamos el ancho para Montserrat-Regular
+    lineas = textwrap.wrap(frase, width=32)
     
-    # Posicionamiento vertical (empezamos más abajo del header)
-    # y_text = m_top + 350
-    # Obtenemos la altura promedio de la fuente para centrar verticalmente
+    # Calculamos altura para centrar verticalmente en el área disponible
     bbox_avg = draw.textbbox((0, 0), "Abg", font=font_cuerpo_regular)
     single_line_height = bbox_avg[3] - bbox_avg[1]
+    total_h = (single_line_height * len(lineas)) + (30 * (len(lineas) - 1))
     
-    # Calcular alto total del bloque de texto
-    total_h = (single_line_height * len(lineas)) + (30 * (len(lineas) - 1)) # pad=30px
-    
-    # Centramos verticalmente en el área disponible (bajo el header hasta el footer)
-    area_h = m_bottom - (m_top + 350) # Espacio disponible
-    y_text = m_top + 350 + ((area_h - total_h) / 2) # Centrado vertical dinámico
+    # Posicionamos el texto
+    y_text = m_top + 250 + (( (m_bottom - 150) - (m_top + 250) - total_h) / 2)
     
     for line in lineas:
-        # draw.text((X_izq, Y_texto), ...)
         draw.text((m_left, y_text), line, font=font_cuerpo_regular, fill=(40, 40, 40))
-        y_text += single_line_height + 30 # Espaciado entre líneas
+        y_text += single_line_height + 30
 
-    # 4. PIE DE PÁGINA (Footer Minimalista)
-    log("🎨 Diseñando footer sin desborde...")
+    # 4. PIE DE PÁGINA (Footer sin desborde)
+    draw.line([(m_left, 940), (m_right, 940)], fill="lightgray", width=2)
     
-    # Línea divisoria suave
-    draw.line([(m_left, m_bottom - 100), (m_right, m_bottom - 100)], fill="lightgray", width=2)
-    
-    # Texto del footer (más pequeño y centrado para que no se corte)
+    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente"
+    # Usamos una fuente más pequeña para el footer
     try:
-        font_footer = ImageFont.truetype("Montserrat-Regular.ttf", 35)
+        font_footer = ImageFont.truetype("Montserrat-Regular.ttf", 32)
     except:
         font_footer = ImageFont.load_default()
-        
-    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente autónoma"
-    
-    # Calcular ancho para centrar
+
     bbox_f = draw.textbbox((0, 0), footer_txt, font=font_footer)
     w_f = bbox_f[2] - bbox_f[0]
     
-    # draw.text(((W-w_f)/2, H_footer), ...)
-    draw.text(((W-w_f)/2, m_bottom - 70), footer_txt, font=font_footer, fill="gray")
+    # Centrado horizontal en el pie
+    draw.text(((W-w_f)/2, 970), footer_txt, font=font_footer, fill="gray")
 
-    # Guardar localmente
+    # Guardar
     if not os.path.exists('galeria_maqueta'): os.makedirs('galeria_maqueta')
-    ruta = f"galeria_maqueta/post_916_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.jpg"
+    ruta = f"galeria_maqueta/post_fb_ig_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.jpg"
     img.save(ruta, quality=95)
     return ruta
 
 def tarea_diaria():
-    log("--- 🚀 INICIANDO MODO MONETIZACIÓN 9:16 ---")
+    log("--- 🚀 GENERANDO CONTENIDO CUADRADO PREMIUM ---")
     try:
-        # Aquí puedes cambiar el tema constantemente después
+        # Aquí es donde el prompt hará su magia
         frase = generar_copy_experto("resiliencia")
-        log(f"📝 Frase Groq: {frase}")
-        
-        ruta_archivo = crear_post_916_premium(frase)
-        log(f"✅ Post 9:16 Profesional creado: {ruta_archivo}")
+        ruta_archivo = crear_post_cuadrado_fino(frase)
+        log(f"✅ Post Finalizado: {ruta_archivo}")
     except Exception as e:
-        log(f"❌ ERROR CRÍTICO: {e}")
+        log(f"❌ ERROR: {e}")
 
 if __name__ == "__main__":
     tarea_diaria()
