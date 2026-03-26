@@ -13,11 +13,10 @@ NOMBRE_PAGINA = "Mente Autónoma"
 USUARIO_IG = "@menteautonoma_ai"
 # ==========================================
 
-def crear_post_cuadrado_ premium(frase):
-    # Formato cuadrado 1:1 para Feed (FB/IG)
+def crear_post_cuadrado_premium(frase):
     W, H = (1080, 1080)
     img = Image.new('RGB', (W, H), color='white')
-    draw = ImageDraw.Draw(img)
+    # ... resto del código ...
     
     # 1. CARGAR FUENTES (Asegúrate de tener estos archivos .ttf)
     try:
