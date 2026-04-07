@@ -9,24 +9,27 @@ def log(msg):
     print(f"DEBUG: {msg}", flush=True)
 
 # ==========================================
-# CONFIGURACIÓN DE TU MARCA
+# CONFIGURACIÓN
 NOMBRE_PAGINA = "Sentir sin Culpa"
-USUARIO_IG = "@sentirsinulpa"
+USUARIO_IG = "@sentirsinculpa"
 # ==========================================
 
 def crear_post_cuadrado_premium(frase):
     W, H = (1080, 1080)
     img = Image.new('RGB', (W, H), color='white')
     draw = ImageDraw.Draw(img)
-    
+
     # ==========================
-    # FUENTES (CLAVE)
+    # FUENTES (MEZCLA CORRECTA)
     # ==========================
     try:
-        font_header_bold = ImageFont.truetype("Montserrat-Bold.ttf", 48)
-        font_header_regular = ImageFont.truetype("Montserrat-Regular.ttf", 34)
-        font_cuerpo = ImageFont.truetype("Montserrat-Regular.ttf", 34)
-        font_footer = ImageFont.truetype("Montserrat-Regular.ttf", 28)
+        font_header_bold = ImageFont.truetype("Montserrat-Bold.ttf", 45)
+        font_header_regular = ImageFont.truetype("Montserrat-Regular.ttf", 36)
+
+        # 🔥 dejamos OpenSans para cuerpo (como tu versión buena)
+        font_cuerpo = ImageFont.truetype("OpenSans-VariableFont_wdth,wght.ttf", 36)
+        font_footer = ImageFont.truetype("OpenSans-VariableFont_wdth,wght.ttf", 28)
+
     except Exception as e:
         log(f"⚠️ Error fuentes: {e}")
         font_header_bold = font_header_regular = font_cuerpo = font_footer = ImageFont.load_default()
@@ -40,45 +43,46 @@ def crear_post_cuadrado_premium(frase):
     m_bottom = int(H * 0.88)
 
     # ==========================
-    # LOGO (MISMO TAMAÑO QUE REFERENCIA)
+    # LOGO (tamaño correcto visual)
     # ==========================
     try:
-        logo = Image.open("logo.png").convert("RGBA").resize((130, 130))
+        logo = Image.open("logo.png").convert("RGBA").resize((120, 120))
         img.paste(logo, (m_left, m_top), logo)
     except:
-        draw.ellipse([m_left, m_top, m_left+130, m_top+130], fill=(255, 0, 127))
+        draw.ellipse([m_left, m_top, m_left+120, m_top+120], fill=(255, 0, 127))
 
     # ==========================
-    # HEADER
+    # HEADER (proporción original)
     # ==========================
-    draw.text((m_left + 150, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill="black")
-    draw.text((m_left + 150, m_top + 65), USUARIO_IG, font=font_header_regular, fill=(130,130,130))
+    draw.text((m_left + 140, m_top + 5), NOMBRE_PAGINA, font=font_header_bold, fill="black")
+    draw.text((m_left + 140, m_top + 55), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
 
     # ==========================
-    # CUERPO TEXTO (ESTILO EDITORIAL EXACTO)
+    # CUERPO (CLON VISUAL DEL BUENO)
     # ==========================
-    lineas = textwrap.wrap(frase, width=42)
+    lineas = textwrap.wrap(frase, width=38)
 
     bbox = draw.textbbox((0, 0), "Ag", font=font_cuerpo)
     line_h = bbox[3] - bbox[1]
 
-    pad = int(line_h * 0.25)
+    # 🔥 ESTE ES EL SECRETO DEL LOOK
+    pad = int(line_h * 0.35)
 
     total_h = (line_h * len(lineas)) + (pad * (len(lineas) - 1))
 
-    # POSICIÓN CORRECTA (más arriba como referencia)
-    area_top = m_top + 180
-    area_bottom = m_bottom - 260
+    # 🔥 POSICIÓN ORIGINAL (NO TOCAR)
+    area_top = m_top + 200
+    area_bottom = m_bottom - 220
     area_height = area_bottom - area_top
 
     y_text = area_top + (area_height - total_h) / 2
 
     for line in lineas:
-        draw.text((m_left, y_text), line, font=font_cuerpo, fill=(85, 85, 85))
+        draw.text((m_left, y_text), line, font=font_cuerpo, fill=(90, 90, 90))
         y_text += line_h + pad
 
     # ==========================
-    # FOOTER
+    # FOOTER (igual al bueno)
     # ==========================
     draw.line([(m_left, 920), (m_right, 920)], fill=(220,220,220), width=2)
 
@@ -98,22 +102,22 @@ def crear_post_cuadrado_premium(frase):
     img.save(ruta, quality=95)
     return ruta
 
-# ==========================
-# AGENTE AUTOMÁTICO
-# ==========================
+
 def tarea_diaria():
     log("--- 🚀 INICIANDO AGENTE AUTÓNOMO ---")
     try:
         temas = ["estoicismo", "disciplina", "mentalidad", "hábitos", "psicología"]
         tema = random.choice(temas)
-        
+
         frase = generar_copy_experto(tema)
         log(f"📝 Frase: {frase}")
-        
+
         ruta = crear_post_cuadrado_premium(frase)
         log(f"✅ Archivo generado: {ruta}")
+
     except Exception as e:
         log(f"❌ ERROR: {e}")
+
 
 if __name__ == "__main__":
     tarea_diaria()
