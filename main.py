@@ -1,102 +1,105 @@
 import os
 import datetime
 import textwrap
-import random
 from PIL import Image, ImageDraw, ImageFont
 from agents.copy_agent import generar_copy_experto
 
 def log(msg):
     print(f"DEBUG: {msg}", flush=True)
 
-# CONFIG
-NOMBRE_PAGINA = "Sentir sin Culpa"
-USUARIO_IG = "@sentirsingulpa"
+# =========================
+# CONFIGURACIÓN
+# =========================
+NOMBRE_PAGINA = "Mente Autónoma"
+USUARIO_IG = "@menteautonoma_ai"
 
-# ==============================
+# =========================
 # CARGA SEGURA DE FUENTES
-# ==============================
+# =========================
 def cargar_fuente(path, size):
     try:
         return ImageFont.truetype(path, size)
-    except Exception as e:
-        log(f"⚠️ Fuente no encontrada ({path}): {e}")
+    except:
+        log(f"⚠️ No se encontró {path}, usando default")
         return ImageFont.load_default()
 
-# ==============================
-# CREAR POST
-# ==============================
-def crear_post_sentir_sin_culpa_premium(frase):
-    
-    # Protección por si el texto es muy largo
-    if len(frase) > 280:
-        frase = frase[:280] + "..."
-        log("⚠️ Frase recortada por longitud")
+# =========================
+# CREAR POST ESTILO PREMIUM
+# =========================
+def crear_post(frase):
 
-    W, H = (1080, 1080)
+    W, H = 1080, 1080
     img = Image.new('RGB', (W, H), color='white')
     draw = ImageDraw.Draw(img)
 
-    # Fuentes
-    font_header_bold = cargar_fuente("Montserrat-Bold.ttf", 45)
-    font_header_regular = cargar_fuente("Montserrat-Regular.ttf", 38)
-    font_cuerpo = cargar_fuente("Montserrat-Regular.ttf", 52)
-    font_footer = cargar_fuente("Montserrat-Regular.ttf", 32)
+    # =========================
+    # FUENTES (CLAVE DEL ESTILO)
+    # =========================
+    font_header_bold = cargar_fuente("Montserrat-SemiBold.ttf", 42)
+    font_header_regular = cargar_fuente("Montserrat-Regular.ttf", 34)
+    font_cuerpo = cargar_fuente("Montserrat-Light.ttf", 46)
+    font_footer = cargar_fuente("Montserrat-Regular.ttf", 30)
 
-    # Márgenes
+    # =========================
+    # MÁRGENES
+    # =========================
     m_left = int(W * 0.12)
     m_top = int(H * 0.12)
-    m_bottom = int(H * 0.88)
 
-    # ==============================
-    # HEADER (LOGO)
-    # ==============================
-    try:
-        logo = Image.open("logo.png").convert("RGBA")
-        logo = logo.resize((125, 125))
-        img.paste(logo, (m_left, m_top), logo)
-        log("✅ logo cargado")
-    except Exception as e:
-        log(f"⚠️ Logo no encontrado: {e}")
-        draw.ellipse([m_left, m_top, m_left+125, m_top+125], fill=(245,230,220))
+    # =========================
+    # HEADER (CÍRCULO + TEXTO)
+    # =========================
+    # Círculo fucsia
+    draw.ellipse([m_left, m_top, m_left+110, m_top+110], fill=(255, 0, 120))
 
-    draw.text((m_left + 155, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill="black")
-    draw.text((m_left + 155, m_top + 70), USUARIO_IG, font=font_header_regular, fill="gray")
+    # Textos header
+    draw.text((m_left + 140, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill=(0,0,0))
+    draw.text((m_left + 140, m_top + 60), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
 
-    # ==============================
-    # CUERPO TEXTO
-    # ==============================
-    lineas = textwrap.wrap(frase, width=32)
+    # =========================
+    # CUERPO TEXTO (ESTILO EDITORIAL)
+    # =========================
+    # IMPORTANTE: líneas más largas (look editorial)
+    lineas = textwrap.wrap(frase, width=38)
 
-    bbox = draw.textbbox((0, 0), "Ag", font=font_cuerpo)
+    # Métricas
+    bbox = draw.textbbox((0,0), "Ag", font=font_cuerpo)
     line_height = bbox[3] - bbox[1]
-    spacing = int(line_height * 0.45)
 
-    total_text_height = (line_height * len(lineas)) + (spacing * (len(lineas) - 1))
+    # Interlineado sutil
+    spacing = int(line_height * 0.35)
 
-    top_text_area = m_top + 280
-    bottom_text_area = m_bottom - 150
-
-    available_height = bottom_text_area - top_text_area
-
-    y_text = top_text_area + ((available_height - total_text_height) / 2)
+    # Posición más arriba (clave visual)
+    y_text = m_top + 240
 
     for line in lineas:
-        draw.text((m_left, y_text), line, font=font_cuerpo, fill=(45,45,45))
+        draw.text(
+            (m_left, y_text),
+            line,
+            font=font_cuerpo,
+            fill=(90, 90, 90)  # gris elegante
+        )
         y_text += line_height + spacing
 
-    # ==============================
+    # =========================
     # FOOTER
-    # ==============================
-    draw.line([(m_left, 940), (W - m_left, 940)], fill="lightgray", width=2)
+    # =========================
+    y_line = 900
+    draw.line([(m_left, y_line), (W - m_left, y_line)], fill=(200,200,200), width=2)
 
-    footer_txt = f"Permítete ser humano en {USUARIO_IG}"
+    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente"
     w_f = draw.textlength(footer_txt, font=font_footer)
 
-    draw.text(((W - w_f)/2, 970), footer_txt, font=font_footer, fill="gray")
+    draw.text(
+        ((W - w_f)/2, y_line + 25),
+        footer_txt,
+        font=font_footer,
+        fill=(150,150,150)
+    )
 
-    # ==============================
+    # =========================
     # GUARDAR
-    # ==============================
+    # =========================
     carpeta = "galeria_posts"
     os.makedirs(carpeta, exist_ok=True)
 
@@ -106,31 +109,17 @@ def crear_post_sentir_sin_culpa_premium(frase):
     img.save(ruta, quality=95)
     return ruta
 
-# ==============================
-# TAREA AUTOMÁTICA
-# ==============================
-def tarea_diaria():
-    log("🤖 Iniciando agente...")
+# =========================
+# EJECUCIÓN
+# =========================
+def tarea():
+    log("Generando post estilo premium...")
 
-    try:
-        temas = [
-            "culpabilidad por descansar",
-            "miedo a decir que no",
-            "priorizarse",
-            "validación emocional"
-        ]
+    frase = generar_copy_experto("reflexión emocional")
+    log(f"Frase: {frase}")
 
-        tema = random.choice(temas)
-        log(f"🧠 Tema: {tema}")
-
-        frase = generar_copy_experto(tema)
-        log(f"📝 Frase: {frase}")
-
-        ruta = crear_post_sentir_sin_culpa_premium(frase)
-        log(f"✅ Post creado: {ruta}")
-
-    except Exception as e:
-        log(f"❌ ERROR: {e}")
+    ruta = crear_post(frase)
+    log(f"Post creado en: {ruta}")
 
 if __name__ == "__main__":
-    tarea_diaria()
+    tarea()
