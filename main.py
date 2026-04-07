@@ -10,8 +10,8 @@ def log(msg):
 
 # ==========================================
 # CONFIGURACIÓN DE TU MARCA
-NOMBRE_PAGINA = "Mente Autónoma"
-USUARIO_IG = "@menteautonoma_ai"
+NOMBRE_PAGINA = "Sentir sin Culpa"
+USUARIO_IG = "@sentirsinulpa"
 # ==========================================
 
 def crear_post_cuadrado_premium(frase):
@@ -19,75 +19,76 @@ def crear_post_cuadrado_premium(frase):
     img = Image.new('RGB', (W, H), color='white')
     draw = ImageDraw.Draw(img)
     
-    # FUENTES
+    # ==========================
+    # FUENTES (CLAVE)
+    # ==========================
     try:
-        font_header_bold = ImageFont.truetype("Montserrat-Bold.ttf", 45)
-        font_header_regular = ImageFont.truetype("Montserrat-Regular.ttf", 36)
-        
-        nombre_fuente = "OpenSans-VariableFont_wdth,wght.ttf"
-        font_cuerpo = ImageFont.truetype(nombre_fuente, 36)  # 🔥 más pequeño
-        
+        font_header_bold = ImageFont.truetype("Montserrat-Bold.ttf", 48)
+        font_header_regular = ImageFont.truetype("Montserrat-Regular.ttf", 34)
+        font_cuerpo = ImageFont.truetype("Montserrat-Regular.ttf", 34)
+        font_footer = ImageFont.truetype("Montserrat-Regular.ttf", 28)
     except Exception as e:
         log(f"⚠️ Error fuentes: {e}")
-        font_header_bold = font_header_regular = font_cuerpo = ImageFont.load_default()
+        font_header_bold = font_header_regular = font_cuerpo = font_footer = ImageFont.load_default()
 
+    # ==========================
     # MÁRGENES
+    # ==========================
     m_left = int(W * 0.12)
     m_right = int(W * 0.88)
     m_top = int(H * 0.12)
     m_bottom = int(H * 0.88)
 
-    # CABECERA
+    # ==========================
+    # LOGO (MISMO TAMAÑO QUE REFERENCIA)
+    # ==========================
     try:
-        logo = Image.open("logo.png").convert("RGBA").resize((110, 110))
+        logo = Image.open("logo.png").convert("RGBA").resize((130, 130))
         img.paste(logo, (m_left, m_top), logo)
     except:
-        draw.ellipse([m_left, m_top, m_left+110, m_top+110], fill=(255, 0, 127))
+        draw.ellipse([m_left, m_top, m_left+130, m_top+130], fill=(255, 0, 127))
 
-    draw.text((m_left + 140, m_top + 5), NOMBRE_PAGINA, font=font_header_bold, fill="black")
-    draw.text((m_left + 140, m_top + 55), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
+    # ==========================
+    # HEADER
+    # ==========================
+    draw.text((m_left + 150, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill="black")
+    draw.text((m_left + 150, m_top + 65), USUARIO_IG, font=font_header_regular, fill=(130,130,130))
 
-    # ==========================================
-    # 🔥 CUERPO TEXTO (ESTILO EDITORIAL)
-    # ==========================================
-    
-    # Líneas más largas (tipo párrafo)
-    lineas = textwrap.wrap(frase, width=38)
+    # ==========================
+    # CUERPO TEXTO (ESTILO EDITORIAL EXACTO)
+    # ==========================
+    lineas = textwrap.wrap(frase, width=42)
 
-    # Altura de línea
     bbox = draw.textbbox((0, 0), "Ag", font=font_cuerpo)
     line_h = bbox[3] - bbox[1]
 
-    # 🔥 Interlineado más cerrado (como referencia)
-    pad = int(line_h * 0.35)
+    pad = int(line_h * 0.25)
 
     total_h = (line_h * len(lineas)) + (pad * (len(lineas) - 1))
 
-    # Área de texto
-    area_top = m_top + 200
-    area_bottom = m_bottom - 220
+    # POSICIÓN CORRECTA (más arriba como referencia)
+    area_top = m_top + 180
+    area_bottom = m_bottom - 260
     area_height = area_bottom - area_top
 
     y_text = area_top + (area_height - total_h) / 2
 
-    # 🔥 Alineado a la izquierda (CLAVE)
     for line in lineas:
-        draw.text((m_left, y_text), line, font=font_cuerpo, fill=(90, 90, 90))
+        draw.text((m_left, y_text), line, font=font_cuerpo, fill=(85, 85, 85))
         y_text += line_h + pad
 
+    # ==========================
     # FOOTER
+    # ==========================
     draw.line([(m_left, 920), (m_right, 920)], fill=(220,220,220), width=2)
-    
-    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente"
-    try:
-        font_footer = ImageFont.truetype(nombre_fuente, 28)
-    except:
-        font_footer = ImageFont.load_default()
 
+    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente"
     w_f = draw.textlength(footer_txt, font=font_footer)
     draw.text(((W - w_f) / 2, 950), footer_txt, font=font_footer, fill=(140,140,140))
 
+    # ==========================
     # GUARDADO
+    # ==========================
     if not os.path.exists('galeria_maqueta'):
         os.makedirs('galeria_maqueta')
 
@@ -97,6 +98,9 @@ def crear_post_cuadrado_premium(frase):
     img.save(ruta, quality=95)
     return ruta
 
+# ==========================
+# AGENTE AUTOMÁTICO
+# ==========================
 def tarea_diaria():
     log("--- 🚀 INICIANDO AGENTE AUTÓNOMO ---")
     try:
