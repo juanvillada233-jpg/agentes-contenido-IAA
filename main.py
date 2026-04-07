@@ -8,23 +8,23 @@ def log(msg):
     print(f"DEBUG: {msg}", flush=True)
 
 # =========================
-# CONFIGURACIÓN
+# CONFIG
 # =========================
-NOMBRE_PAGINA = "Mente Autónoma"
-USUARIO_IG = "@menteautonoma_ai"
+NOMBRE_PAGINA = "Sentir sin Culpa"
+USUARIO_IG = "@sentirsingulpa"
 
 # =========================
-# CARGA SEGURA DE FUENTES
+# FUENTES
 # =========================
 def cargar_fuente(path, size):
     try:
         return ImageFont.truetype(path, size)
     except:
-        log(f"⚠️ No se encontró {path}, usando default")
+        log(f"⚠️ No se encontró {path}")
         return ImageFont.load_default()
 
 # =========================
-# CREAR POST ESTILO PREMIUM
+# POST PREMIUM BIEN ESCALADO
 # =========================
 def crear_post(frase):
 
@@ -33,12 +33,12 @@ def crear_post(frase):
     draw = ImageDraw.Draw(img)
 
     # =========================
-    # FUENTES (CLAVE DEL ESTILO)
+    # FUENTES (AUMENTADAS)
     # =========================
-    font_header_bold = cargar_fuente("Montserrat-SemiBold.ttf", 42)
-    font_header_regular = cargar_fuente("Montserrat-Regular.ttf", 34)
-    font_cuerpo = cargar_fuente("Montserrat-Light.ttf", 46)
-    font_footer = cargar_fuente("Montserrat-Regular.ttf", 30)
+    font_header_bold = cargar_fuente("Montserrat-SemiBold.ttf", 52)
+    font_header_regular = cargar_fuente("Montserrat-Regular.ttf", 40)
+    font_cuerpo = cargar_fuente("Montserrat-Light.ttf", 58)
+    font_footer = cargar_fuente("Montserrat-Regular.ttf", 36)
 
     # =========================
     # MÁRGENES
@@ -47,37 +47,32 @@ def crear_post(frase):
     m_top = int(H * 0.12)
 
     # =========================
-    # HEADER (CÍRCULO + TEXTO)
+    # HEADER
     # =========================
-    # Círculo fucsia
-    draw.ellipse([m_left, m_top, m_left+110, m_top+110], fill=(255, 0, 120))
+    draw.ellipse([m_left, m_top, m_left+130, m_top+130], fill=(255, 0, 120))
 
-    # Textos header
-    draw.text((m_left + 140, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill=(0,0,0))
-    draw.text((m_left + 140, m_top + 60), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
+    draw.text((m_left + 160, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill=(0,0,0))
+    draw.text((m_left + 160, m_top + 70), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
 
     # =========================
-    # CUERPO TEXTO (ESTILO EDITORIAL)
+    # TEXTO (CORREGIDO)
     # =========================
-    # IMPORTANTE: líneas más largas (look editorial)
-    lineas = textwrap.wrap(frase, width=38)
+    lineas = textwrap.wrap(frase, width=32)  # 🔥 clave para tamaño correcto
 
-    # Métricas
     bbox = draw.textbbox((0,0), "Ag", font=font_cuerpo)
     line_height = bbox[3] - bbox[1]
 
-    # Interlineado sutil
-    spacing = int(line_height * 0.35)
+    spacing = int(line_height * 0.40)
 
-    # Posición más arriba (clave visual)
-    y_text = m_top + 240
+    # MÁS ARRIBA PERO BIEN DISTRIBUIDO
+    y_text = m_top + 320
 
     for line in lineas:
         draw.text(
             (m_left, y_text),
             line,
             font=font_cuerpo,
-            fill=(90, 90, 90)  # gris elegante
+            fill=(80, 80, 80)  # gris premium
         )
         y_text += line_height + spacing
 
@@ -87,7 +82,7 @@ def crear_post(frase):
     y_line = 900
     draw.line([(m_left, y_line), (W - m_left, y_line)], fill=(200,200,200), width=2)
 
-    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente"
+    footer_txt = f"Permítete ser humano en {USUARIO_IG}"
     w_f = draw.textlength(footer_txt, font=font_footer)
 
     draw.text(
@@ -113,13 +108,13 @@ def crear_post(frase):
 # EJECUCIÓN
 # =========================
 def tarea():
-    log("Generando post estilo premium...")
+    log("Generando post premium...")
 
     frase = generar_copy_experto("reflexión emocional")
-    log(f"Frase: {frase}")
+    log(frase)
 
     ruta = crear_post(frase)
-    log(f"Post creado en: {ruta}")
+    log(f"Post creado: {ruta}")
 
 if __name__ == "__main__":
     tarea()
