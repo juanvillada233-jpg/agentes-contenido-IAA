@@ -29,6 +29,12 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add galeria_maqueta/*.jpg
-          git commit -m "🤖 Nuevo Post Diseñado"
+          
+          # Esto le dice a GitHub: "Añade todo lo nuevo, incluyendo carpetas"
+          git add .
+          
+          # Esto hace el commit. El "|| exit 0" es MAGIA: 
+          # evita que el proceso falle si por alguna razón no hay cambios.
+          git commit -m "Agente: Nuevo post de Sentir sin Culpa" || exit 0
+          
           git push
