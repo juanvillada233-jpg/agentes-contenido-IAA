@@ -1,120 +1,115 @@
 import os
 import datetime
 import textwrap
+import random
 from PIL import Image, ImageDraw, ImageFont
 from agents.copy_agent import generar_copy_experto
 
 def log(msg):
     print(f"DEBUG: {msg}", flush=True)
 
-# =========================
-# CONFIG
-# =========================
-NOMBRE_PAGINA = "Sentir sin Culpa"
-USUARIO_IG = "@sentirsingulpa"
+# ==========================================
+# CONFIGURACIÓN DE TU MARCA
+NOMBRE_PAGINA = "Mente Autónoma"
+USUARIO_IG = "@menteautonoma_ai"
+# ==========================================
 
-# =========================
-# FUENTES
-# =========================
-def cargar_fuente(path, size):
-    try:
-        return ImageFont.truetype(path, size)
-    except:
-        log(f"⚠️ No se encontró {path}")
-        return ImageFont.load_default()
-
-# =========================
-# POST PREMIUM BIEN ESCALADO
-# =========================
-def crear_post(frase):
-
-    W, H = 1080, 1080
+def crear_post_cuadrado_premium(frase):
+    W, H = (1080, 1080)
     img = Image.new('RGB', (W, H), color='white')
     draw = ImageDraw.Draw(img)
+    
+    # FUENTES
+    try:
+        font_header_bold = ImageFont.truetype("Montserrat-Bold.ttf", 45)
+        font_header_regular = ImageFont.truetype("Montserrat-Regular.ttf", 36)
+        
+        nombre_fuente = "OpenSans-VariableFont_wdth,wght.ttf"
+        font_cuerpo = ImageFont.truetype(nombre_fuente, 36)  # 🔥 más pequeño
+        
+    except Exception as e:
+        log(f"⚠️ Error fuentes: {e}")
+        font_header_bold = font_header_regular = font_cuerpo = ImageFont.load_default()
 
-    # =========================
-    # FUENTES (AUMENTADAS)
-    # =========================
-    font_header_bold = cargar_fuente("Montserrat-SemiBold.ttf", 52)
-    font_header_regular = cargar_fuente("Montserrat-Regular.ttf", 40)
-    font_cuerpo = cargar_fuente("Montserrat-Light.ttf", 58)
-    font_footer = cargar_fuente("Montserrat-Regular.ttf", 36)
-
-    # =========================
     # MÁRGENES
-    # =========================
     m_left = int(W * 0.12)
+    m_right = int(W * 0.88)
     m_top = int(H * 0.12)
+    m_bottom = int(H * 0.88)
 
-    # =========================
-    # HEADER
-    # =========================
-    draw.ellipse([m_left, m_top, m_left+130, m_top+130], fill=(255, 0, 120))
+    # CABECERA
+    try:
+        logo = Image.open("logo.png").convert("RGBA").resize((110, 110))
+        img.paste(logo, (m_left, m_top), logo)
+    except:
+        draw.ellipse([m_left, m_top, m_left+110, m_top+110], fill=(255, 0, 127))
 
-    draw.text((m_left + 160, m_top + 10), NOMBRE_PAGINA, font=font_header_bold, fill=(0,0,0))
-    draw.text((m_left + 160, m_top + 70), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
+    draw.text((m_left + 140, m_top + 5), NOMBRE_PAGINA, font=font_header_bold, fill="black")
+    draw.text((m_left + 140, m_top + 55), USUARIO_IG, font=font_header_regular, fill=(120,120,120))
 
-    # =========================
-    # TEXTO (CORREGIDO)
-    # =========================
-    lineas = textwrap.wrap(frase, width=32)  # 🔥 clave para tamaño correcto
+    # ==========================================
+    # 🔥 CUERPO TEXTO (ESTILO EDITORIAL)
+    # ==========================================
+    
+    # Líneas más largas (tipo párrafo)
+    lineas = textwrap.wrap(frase, width=38)
 
-    bbox = draw.textbbox((0,0), "Ag", font=font_cuerpo)
-    line_height = bbox[3] - bbox[1]
+    # Altura de línea
+    bbox = draw.textbbox((0, 0), "Ag", font=font_cuerpo)
+    line_h = bbox[3] - bbox[1]
 
-    spacing = int(line_height * 0.40)
+    # 🔥 Interlineado más cerrado (como referencia)
+    pad = int(line_h * 0.35)
 
-    # MÁS ARRIBA PERO BIEN DISTRIBUIDO
-    y_text = m_top + 320
+    total_h = (line_h * len(lineas)) + (pad * (len(lineas) - 1))
 
+    # Área de texto
+    area_top = m_top + 200
+    area_bottom = m_bottom - 220
+    area_height = area_bottom - area_top
+
+    y_text = area_top + (area_height - total_h) / 2
+
+    # 🔥 Alineado a la izquierda (CLAVE)
     for line in lineas:
-        draw.text(
-            (m_left, y_text),
-            line,
-            font=font_cuerpo,
-            fill=(80, 80, 80)  # gris premium
-        )
-        y_text += line_height + spacing
+        draw.text((m_left, y_text), line, font=font_cuerpo, fill=(90, 90, 90))
+        y_text += line_h + pad
 
-    # =========================
     # FOOTER
-    # =========================
-    y_line = 900
-    draw.line([(m_left, y_line), (W - m_left, y_line)], fill=(200,200,200), width=2)
+    draw.line([(m_left, 920), (m_right, 920)], fill=(220,220,220), width=2)
+    
+    footer_txt = f"Sigue a {USUARIO_IG} para potenciar tu mente"
+    try:
+        font_footer = ImageFont.truetype(nombre_fuente, 28)
+    except:
+        font_footer = ImageFont.load_default()
 
-    footer_txt = f"Permítete ser humano en {USUARIO_IG}"
     w_f = draw.textlength(footer_txt, font=font_footer)
+    draw.text(((W - w_f) / 2, 950), footer_txt, font=font_footer, fill=(140,140,140))
 
-    draw.text(
-        ((W - w_f)/2, y_line + 25),
-        footer_txt,
-        font=font_footer,
-        fill=(150,150,150)
-    )
+    # GUARDADO
+    if not os.path.exists('galeria_maqueta'):
+        os.makedirs('galeria_maqueta')
 
-    # =========================
-    # GUARDAR
-    # =========================
-    carpeta = "galeria_posts"
-    os.makedirs(carpeta, exist_ok=True)
-
-    nombre = f"post_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-    ruta = os.path.join(carpeta, nombre)
+    nombre_archivo = f"post_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+    ruta = os.path.join('galeria_maqueta', nombre_archivo)
 
     img.save(ruta, quality=95)
     return ruta
 
-# =========================
-# EJECUCIÓN
-# =========================
-def tarea():
-    log("Generando post premium...")
-
-    frase = generar_copy_experto("reflexión emocional")
-    log(frase)
-
-    ruta = crear_post(frase)
-    log(f"Post creado: {ruta}")
+def tarea_diaria():
+    log("--- 🚀 INICIANDO AGENTE AUTÓNOMO ---")
+    try:
+        temas = ["estoicismo", "disciplina", "mentalidad", "hábitos", "psicología"]
+        tema = random.choice(temas)
+        
+        frase = generar_copy_experto(tema)
+        log(f"📝 Frase: {frase}")
+        
+        ruta = crear_post_cuadrado_premium(frase)
+        log(f"✅ Archivo generado: {ruta}")
+    except Exception as e:
+        log(f"❌ ERROR: {e}")
 
 if __name__ == "__main__":
-    tarea()
+    tarea_diaria()
