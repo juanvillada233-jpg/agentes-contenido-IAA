@@ -1,40 +1,49 @@
 name: Generar Contenido Maqueta
 
 on:
-  workflow_dispatch: # Botón manual para tus pruebas
+  workflow_dispatch: # 🔥 Ejecutar manual (HOY)
   schedule:
-    - cron: '0 9 * * *' # 9 AM automático
+    - cron: '0 9 * * *' # ⏰ Todos los días 9 AM
 
 jobs:
   construir:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Clonar repo
       - name: Clonar código
         uses: actions/checkout@v4
 
+      # 2. Python
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Instalar herramientas de diseño
+      # 3. Instalar dependencias
+      - name: Instalar herramientas
         run: pip install requests Pillow
 
-      - name: Ejecutar Agente Diseñador
+      # 🧹 4. LIMPIAR IMÁGENES (CLAVE)
+      - name: Limpiar imágenes anteriores
+        run: rm -rf galeria_maqueta/*
+
+      # 🔥 5. GENERAR 30 IMÁGENES
+      - name: Generar 30 imágenes
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: python -u main.py
+        run: |
+          for i in {1..30}
+          do
+            echo "Generando imagen $i"
+            python -u main.py
+          done
 
-      - name: Guardar en Galería de GitHub
+      # 💾 6. GUARDAR EN GITHUB
+      - name: Guardar en GitHub
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
-          # Esto le dice a GitHub: "Añade todo lo nuevo, incluyendo carpetas"
           git add .
-          
-          # Esto hace el commit. El "|| exit 0" es MAGIA: 
-          # evita que el proceso falle si por alguna razón no hay cambios.
-          git commit -m "Agente: Nuevo post de Sentir sin Culpa" || exit 0
-          
+          git commit -m "Agente: 30 posts automáticos diarios" || exit 0
           git push
