@@ -96,7 +96,7 @@ def crear_post_cuadrado_premium(frase):
     if not os.path.exists('galeria_maqueta'):
         os.makedirs('galeria_maqueta')
 
-    nombre_archivo = f"post_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+    nombre_archivo = f"post_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
     ruta = os.path.join('galeria_maqueta', nombre_archivo)
 
     img.save(ruta, quality=95)
